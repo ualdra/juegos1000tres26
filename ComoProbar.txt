@@ -48,11 +48,13 @@ function Stop-PortProcess($port) {
 }
 
 Stop-PortProcess 8080
+Stop-PortProcess 8081
 Stop-PortProcess 8082
 Stop-PortProcess 8091
 
 Notas:
 - 8080: frontend Flask
+- 8081: API runtime interna (ApiConexion)
 - 8082: backend Spring
 - 8091: servidor WebSocket interno del backend
 
@@ -68,10 +70,12 @@ cd .\juegos1000tres-backend
 .\mvnw.cmd spring-boot:run
 
 Comprobar que responde:
-Invoke-WebRequest -UseBasicParsing http://127.0.0.1:8082/api/pruebas/websocket-chat/config | Select-Object -ExpandProperty StatusCode
+(Test-NetConnection 127.0.0.1 -Port 8082).TcpTestSucceeded
+(Test-NetConnection 127.0.0.1 -Port 8091).TcpTestSucceeded
 
 Debe devolver:
-200
+True
+True
 
 Criterio de exito del backend:
 - Si ves en consola "Tomcat started on port 8082" y "Started Juegos1000tresBackendApplication", el backend esta OK.
@@ -160,12 +164,16 @@ http://127.0.0.1:<PUERTO_FRONTEND>/server/prueba_websocket/pantalla
 
 7) Variables de entorno opcionales
 ----------------------------------
-Solo si el backend no corre en 127.0.0.1:8082.
+Solo si necesitas usar endpoints/hosts distintos de los valores por defecto.
 
 En la terminal del frontend, antes de python .\main.py:
 
-$env:SPACE_INVADERS_BACKEND_URL="http://127.0.0.1:8082/api/pruebas/space-invaders"
-$env:PRUEBA_WEBSOCKET_BACKEND_URL="http://127.0.0.1:8082/api/pruebas/websocket-chat"
+$env:SPACE_INVADERS_BACKEND_EVENT_URL="http://127.0.0.1:8081/api/salas/space-invaders/eventos"
+$env:SPACE_INVADERS_BACKEND_UPDATES_URL="http://127.0.0.1:8081/api/salas/space-invaders/actualizaciones"
+$env:PREGUNTAS_BACKEND_EVENT_URL="http://127.0.0.1:8081/api/salas/preguntas/eventos"
+$env:PREGUNTAS_BACKEND_UPDATES_URL="http://127.0.0.1:8081/api/salas/preguntas/actualizaciones"
+$env:PRUEBA_WEBSOCKET_WS_JUGADORES_URL="ws://127.0.0.1:8091/ws/salas/prueba-websocket-jugadores"
+$env:PRUEBA_WEBSOCKET_WS_PANTALLA_URL="ws://127.0.0.1:8091/ws/salas/prueba-websocket-pantalla"
 
 
 8) Error comun y solucion rapida

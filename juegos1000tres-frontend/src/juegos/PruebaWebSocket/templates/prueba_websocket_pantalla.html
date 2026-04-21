@@ -24,6 +24,9 @@
         </section>
     </main>
 
+    <script>
+        window.PRUEBA_WEBSOCKET_URL_PANTALLA = {{ ws_pantalla_url | tojson }};
+    </script>
     <script type="module" src="{{ url_for('.static', filename='js/prueba_websocket_pantalla.js') }}"></script>
 </body>
 </html>

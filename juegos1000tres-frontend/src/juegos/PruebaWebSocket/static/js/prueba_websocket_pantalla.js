@@ -44,17 +44,17 @@ function setEstado(texto, esError = false) {
   estadoConexion.classList.toggle("error", esError);
 }
 
-async function cargarConfig() {
-  const response = await fetch("/server/prueba_websocket/api/config", {
-    method: "GET",
-    headers: { "Accept": "application/json" },
-  });
+function obtenerUrlCanalPantalla() {
+  const urlTemplate = typeof window.PRUEBA_WEBSOCKET_URL_PANTALLA === "string"
+    ? window.PRUEBA_WEBSOCKET_URL_PANTALLA.trim()
+    : "";
 
-  if (!response.ok) {
-    throw new Error(`No se pudo obtener config (${response.status})`);
+  if (urlTemplate) {
+    return urlTemplate;
   }
 
-  return response.json();
+  const host = window.location.hostname || "127.0.0.1";
+  return `ws://${host}:8091/ws/salas/prueba-websocket-pantalla`;
 }
 
 function renderizarJugadores(jugadores) {
@@ -99,10 +99,9 @@ function renderizarJugadores(jugadores) {
 }
 
 async function iniciar() {
-  const config = await cargarConfig();
-  const urlPantalla = typeof config.urlPantalla === "string" ? config.urlPantalla.trim() : "";
+  const urlPantalla = obtenerUrlCanalPantalla();
   if (!urlPantalla) {
-    throw new Error("Config backend sin urlPantalla");
+    throw new Error("No hay URL WebSocket de pantalla configurada");
   }
 
   const recibo = new JsonRecibo().conEvento(

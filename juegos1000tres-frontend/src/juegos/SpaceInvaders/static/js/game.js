@@ -381,9 +381,13 @@ function normalizarJugadoresEstado(jugadores) {
     return jugadores
         .map((jugador) => ({
             jugadorId: typeof jugador.jugadorId === 'string' ? jugador.jugadorId : '',
-            nombreJugador: typeof jugador.player === 'string' ? jugador.player : '',
-            puntuacion: Number.isFinite(jugador.score) ? jugador.score : 0,
-            muerto: Boolean(jugador.dead),
+            nombreJugador:
+                typeof jugador.nombreJugador === 'string' ? jugador.nombreJugador
+                    : (typeof jugador.player === 'string' ? jugador.player : ''),
+            puntuacion:
+                Number.isFinite(jugador.puntuacion) ? jugador.puntuacion
+                    : (Number.isFinite(jugador.score) ? jugador.score : 0),
+            muerto: typeof jugador.muerto === 'boolean' ? jugador.muerto : Boolean(jugador.dead),
         }))
         .filter((jugador) => jugador.jugadorId)
         .sort((a, b) => b.puntuacion - a.puntuacion);

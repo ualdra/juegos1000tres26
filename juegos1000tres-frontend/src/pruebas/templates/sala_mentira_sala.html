@@ -30,13 +30,13 @@
                 </form>
             </div>
 
-            <section id="resultadoPartida" class="resultado {% if es_pantalla | default(false) or juego_id == 'prueba_websocket' %}hidden{% endif %}" aria-live="polite">
+            <section id="resultadoPartida" class="resultado {% if es_pantalla | default(false) or juego_id == 'prueba_websocket' or juego_id == 'preguntas' %}hidden{% endif %}" aria-live="polite">
                 <h2>Resultado de la partida</h2>
                 <p id="resultadoTexto">Aun no hay resultado.</p>
             </section>
 
             <section id="juegoContainer" class="juego hidden" aria-live="polite">
-                <iframe id="juegoIframe" title="Space Invaders de prueba"></iframe>
+                <iframe id="juegoIframe" title="{{ juego_titulo | default('Juego de prueba') }}"></iframe>
             </section>
         </section>
     </main>
@@ -64,6 +64,14 @@
                     return '/server/prueba_websocket?player=' + encodeURIComponent(nombre);
                 }
 
+                if (juegoId === 'preguntas') {
+                    if (esPantalla) {
+                        return '/server/preguntas/pantalla?screenId=' + encodeURIComponent(nombre);
+                    }
+
+                    return '/server/preguntas?player=' + encodeURIComponent(nombre);
+                }
+
                 if (esPantalla) {
                     return '/server/space_invaders/pantalla?screenId=' + encodeURIComponent(nombre);
                 }
@@ -80,6 +88,10 @@
                     return 'Iniciar Prueba WebSocket';
                 }
 
+                if (juegoId === 'preguntas') {
+                    return 'Iniciar Preguntas';
+                }
+
                 return 'Iniciar Space Invaders';
             }
 
@@ -90,6 +102,10 @@
 
                 if (juegoId === 'prueba_websocket') {
                     return 'Prueba WebSocket iniciada';
+                }
+
+                if (juegoId === 'preguntas') {
+                    return 'Juego Preguntas iniciado';
                 }
 
                 return 'Juego iniciado';

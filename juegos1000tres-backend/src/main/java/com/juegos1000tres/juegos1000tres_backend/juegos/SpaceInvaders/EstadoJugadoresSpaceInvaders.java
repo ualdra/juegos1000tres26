@@ -11,6 +11,8 @@ import com.juegos1000tres.juegos1000tres_backend.comunicacion.Enviable;
 
 public class EstadoJugadoresSpaceInvaders extends Enviable {
 
+    private static final String COMANDO_ESTADO_JUGADORES = "ESTADO_JUGADORES";
+
     private static final Pattern JUGADOR_JSON = Pattern.compile(
             "\\{\\\"jugadorId\\\":\\\"([^\\\"]+)\\\",\\\"nombreJugador\\\":\\\"((?:\\\\\\\\.|[^\\\"])*)\\\",\\\"puntuacion\\\":(-?\\d+),\\\"muerto\\\":(true|false)\\}");
 
@@ -32,7 +34,9 @@ public class EstadoJugadoresSpaceInvaders extends Enviable {
     @Override
     public Object out() {
         StringBuilder json = new StringBuilder();
-        json.append("{\"jugadores\":[");
+        json.append("{\"comando\":\"")
+            .append(COMANDO_ESTADO_JUGADORES)
+            .append("\",\"jugadores\":[");
 
         for (int i = 0; i < this.jugadores.size(); i++) {
             EstadoJugadorDTO jugador = this.jugadores.get(i);

@@ -105,11 +105,17 @@ class SalaMentiraPruebas:
         if isinstance(valor, str) and valor.strip().lower() == "prueba_websocket":
             return "prueba_websocket"
 
+        if isinstance(valor, str) and valor.strip().lower() == "preguntas":
+            return "preguntas"
+
         return "space_invaders"
 
     @staticmethod
     def _titulo_juego(juego_id: str) -> str:
         if juego_id == "prueba_websocket":
             return "Prueba WebSocket"
+
+        if juego_id == "preguntas":
+            return "Preguntas"
 
         return "Space Invaders"

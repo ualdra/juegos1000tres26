@@ -124,9 +124,13 @@
 
                 const ordenados = jugadores
                     .map((item) => ({
-                        player: typeof item.player === 'string' ? item.player : 'Jugador',
-                        score: Number.isFinite(item.score) ? item.score : 0,
-                        dead: Boolean(item.dead),
+                        player: typeof item.nombreJugador === 'string'
+                            ? item.nombreJugador
+                            : (typeof item.player === 'string' ? item.player : 'Jugador'),
+                        score: Number.isFinite(item.puntuacion)
+                            ? item.puntuacion
+                            : (Number.isFinite(item.score) ? item.score : 0),
+                        dead: typeof item.muerto === 'boolean' ? item.muerto : Boolean(item.dead),
                     }))
                     .sort((a, b) => b.score - a.score);
 

@@ -118,27 +118,26 @@ function agregarMensaje(texto) {
   mensajesList.appendChild(item);
 }
 
-async function cargarConfig() {
-  const response = await fetch("/server/prueba_websocket/api/config", {
-    method: "GET",
-    headers: { "Accept": "application/json" },
-  });
+function obtenerUrlCanalJugadores() {
+  const urlTemplate = typeof window.PRUEBA_WEBSOCKET_URL_JUGADORES === "string"
+    ? window.PRUEBA_WEBSOCKET_URL_JUGADORES.trim()
+    : "";
 
-  if (!response.ok) {
-    throw new Error(`No se pudo obtener config (${response.status})`);
+  if (urlTemplate) {
+    return urlTemplate;
   }
 
-  return response.json();
+  const host = window.location.hostname || "127.0.0.1";
+  return `ws://${host}:8091/ws/salas/prueba-websocket-jugadores`;
 }
 
 async function iniciar() {
   const jugadorId = obtenerJugadorId();
   nombreJugadorInput.value = obtenerNombreInicial();
 
-  const config = await cargarConfig();
-  const urlJugadores = typeof config.urlJugadores === "string" ? config.urlJugadores.trim() : "";
+  const urlJugadores = obtenerUrlCanalJugadores();
   if (!urlJugadores) {
-    throw new Error("Config backend sin urlJugadores");
+    throw new Error("No hay URL WebSocket de jugadores configurada");
   }
 
   const recibo = new JsonRecibo().conEvento(

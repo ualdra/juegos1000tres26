@@ -1,4 +1,4 @@
-package com.juegos1000tres.juegos1000tres_backend.juegos.SpaceInvaders.pruebas.comunicacion;
+package com.juegos1000tres.juegos1000tres_backend.juegos.Preguntas.pruebas.comunicacion;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -8,7 +8,7 @@ import java.util.Optional;
 
 import com.juegos1000tres.juegos1000tres_backend.comunicacion.Conexion;
 
-public final class ConexionPantallaPruebas implements Conexion<String> {
+public final class ConexionPantallaPreguntasPruebas implements Conexion<String> {
 
     private static final String PAYLOAD_VACIO = "{}";
     private static final int MAX_UPDATES_POR_PANTALLA = 100;
@@ -16,8 +16,8 @@ public final class ConexionPantallaPruebas implements Conexion<String> {
     private final String salaId;
     private final Map<String, Deque<String>> updatesByScreen;
 
-    public ConexionPantallaPruebas(String salaId) {
-        this.salaId = (salaId == null || salaId.isBlank()) ? "space-invaders-pruebas" : salaId;
+    public ConexionPantallaPreguntasPruebas(String salaId) {
+        this.salaId = (salaId == null || salaId.isBlank()) ? "preguntas-pruebas" : salaId;
         this.updatesByScreen = new LinkedHashMap<>();
     }
 
@@ -65,7 +65,7 @@ public final class ConexionPantallaPruebas implements Conexion<String> {
 
     @Override
     public String getCanalSala() {
-        return "/api/pruebas/space-invaders/updates";
+        return "/api/pruebas/preguntas/updates";
     }
 
     public synchronized Optional<String> obtenerSiguienteActualizacion(String screenId) {

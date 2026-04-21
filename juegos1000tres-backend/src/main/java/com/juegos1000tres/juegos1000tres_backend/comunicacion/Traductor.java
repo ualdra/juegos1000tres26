@@ -29,6 +29,11 @@ public class Traductor<PAYLOAD> {
         conexion.enviar(payload);
     }
 
+    public void enviarPayload(PAYLOAD payload) {
+        Objects.requireNonNull(payload, "El payload es obligatorio");
+        conexion.enviar(payload);
+    }
+
     public Optional<PAYLOAD> procesar(PAYLOAD payload) {
         Objects.requireNonNull(payload, "El payload es obligatorio");
 

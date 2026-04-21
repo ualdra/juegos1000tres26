@@ -1,14 +1,14 @@
-package com.juegos1000tres.juegos1000tres_backend.juegos.SpaceInvaders.pruebas.comunicacion;
+package com.juegos1000tres.juegos1000tres_backend.juegos.Preguntas.pruebas.comunicacion;
 
 import com.juegos1000tres.juegos1000tres_backend.comunicacion.Conexion;
 
-public final class ConexionNulaPruebas implements Conexion<String> {
+public final class ConexionNulaPreguntasPruebas implements Conexion<String> {
 
     private final String salaId;
     private String ultimoPayload;
 
-    public ConexionNulaPruebas(String salaId) {
-        this.salaId = (salaId == null || salaId.isBlank()) ? "space-invaders-pruebas" : salaId;
+    public ConexionNulaPreguntasPruebas(String salaId) {
+        this.salaId = (salaId == null || salaId.isBlank()) ? "preguntas-pruebas" : salaId;
         this.ultimoPayload = "{}";
     }
 
@@ -49,6 +49,6 @@ public final class ConexionNulaPruebas implements Conexion<String> {
 
     @Override
     public String getCanalSala() {
-        return "/api/pruebas/space-invaders";
+        return "/api/pruebas/preguntas";
     }
 }

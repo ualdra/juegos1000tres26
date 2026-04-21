@@ -35,6 +35,9 @@
         </section>
     </main>
 
+    <script>
+        window.PRUEBA_WEBSOCKET_URL_JUGADORES = {{ ws_jugadores_url | tojson }};
+    </script>
     <script type="module" src="{{ url_for('.static', filename='js/prueba_websocket.js') }}"></script>
 </body>
 </html>

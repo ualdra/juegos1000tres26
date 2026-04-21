@@ -32,6 +32,7 @@ STATIC_DIR    = os.path.join(BASE_DIR, "src", "menu", "vistaSeleccionJuego")
 PRUEBAS_DIR   = os.path.join(BASE_DIR, "src", "pruebas")
 SPACE_INVADERS_DIR = os.path.join(BASE_DIR, "src", "juegos", "SpaceInvaders")
 PRUEBA_WEBSOCKET_DIR = os.path.join(BASE_DIR, "src", "juegos", "PruebaWebSocket")
+PREGUNTAS_DIR = os.path.join(BASE_DIR, "src", "juegos", "Preguntas")
 
 # Importamos el catálogo de juegos
 import sys
@@ -39,10 +40,12 @@ sys.path.insert(0, TEMPLATE_DIR)
 sys.path.insert(0, PRUEBAS_DIR)
 sys.path.insert(0, SPACE_INVADERS_DIR)
 sys.path.insert(0, PRUEBA_WEBSOCKET_DIR)
+sys.path.insert(0, PREGUNTAS_DIR)
 from listaJuegos import ListaJuegos  # noqa: E402
 from sala_mentira import SalaMentiraPruebas  # noqa: E402
 from space_invaders_blueprint import create_space_invaders_blueprint  # noqa: E402
 from prueba_websocket_blueprint import create_prueba_websocket_blueprint  # noqa: E402
+from preguntas_blueprint import create_preguntas_blueprint  # noqa: E402
 
 # ── Configuración Flask ───────────────────────────────────────────────────────
 app = Flask(
@@ -58,10 +61,12 @@ catalogo = ListaJuegos()
 # ── Blueprints de Juegos ──────────────────────────────────────────────────────
 space_invaders_bp = create_space_invaders_blueprint(BASE_DIR)
 prueba_websocket_bp = create_prueba_websocket_blueprint(BASE_DIR)
+preguntas_bp = create_preguntas_blueprint(BASE_DIR)
 
 # Registramos el servidor interno del juego
 app.register_blueprint(space_invaders_bp, url_prefix="/server/space_invaders")
 app.register_blueprint(prueba_websocket_bp, url_prefix="/server/prueba_websocket")
+app.register_blueprint(preguntas_bp, url_prefix="/server/preguntas")
 
 # Sala de mentira para pruebas manuales (aislada y facil de eliminar)
 sala_mentira_pruebas = SalaMentiraPruebas(BASE_DIR)

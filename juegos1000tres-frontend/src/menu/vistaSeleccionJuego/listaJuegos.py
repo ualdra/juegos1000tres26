@@ -48,6 +48,15 @@ class ListaJuegos:
                 color="#53d8fb",
                 url="/server/prueba_websocket",
             ),
+            Juego(
+                id="preguntas",
+                titulo="Preguntas Personales",
+                descripcion="Rondas de preguntas sobre un jugador elegido al azar. Responde, elige y suma puntos.",
+                genero="Social",
+                icono="🧠",
+                color="#ffcb47",
+                url="/server/preguntas",
+            ),
         ]
 
     # ── Consultas ────────────────────────────────────────────────────────────

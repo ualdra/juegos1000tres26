@@ -1,8 +1,5 @@
 package com.juegos1000tres.juegos1000tres_backend.juegos.PruebaWebSocket;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -85,38 +82,10 @@ public class PruebaWebSocketService {
         this.conexionPantalla.desconectar();
     }
 
-    public Map<String, Object> obtenerConfig() {
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("tipoComunicacion", "WEBSOCKET");
-        body.put("canalJugadores", this.conexionJugadores.getCanalSala());
-        body.put("urlJugadores", this.conexionJugadores.getUrlCanalSala());
-        body.put("canalPantalla", this.conexionPantalla.getCanalSala());
-        body.put("urlPantalla", this.conexionPantalla.getUrlCanalSala());
-
-        body.put("comandos", List.of(
-                PruebaWebSocket.COMANDO_ENVIAR_TEXTO,
-                PruebaWebSocket.COMANDO_TEXTO_GLOBAL,
-                PruebaWebSocket.COMANDO_ESTADO_PANTALLA));
-
-        return body;
-    }
-
-    public List<String> obtenerMensajesGlobales() {
-        return this.juego.obtenerHistorialGlobal();
-    }
-
-    public List<EstadoPantallaEnviable.JugadorPalabrasDTO> obtenerEstadoPantalla() {
-        return this.juego.obtenerEstadoPantalla();
-    }
-
-    public boolean isJuegoEnCurso() {
-        return this.juego.isEnCurso();
-    }
-
     private void bucleProcesamiento() {
         while (this.loopActivo.get()) {
             try {
-                String payload = this.conexionJugadores.recibir();
+                String payload = this.traductorEventosJugadores.recibirPayload();
                 if (payload == null || payload.isBlank() || PAYLOAD_VACIO.equals(payload.trim())) {
                     dormirBreve();
                     continue;

@@ -10,28 +10,26 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import com.juegos1000tres.juegos1000tres_backend.comunicacion.Conexion;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
-
-import com.juegos1000tres.juegos1000tres_backend.comunicacion.Conexion;
 
 public class ApiConexion implements Conexion<String> {
 
     private static final String TIPO_COMUNICACION = ComunicacionRuntimeConfig.apiTipoComunicacion();
     private static final String HOST_API = ComunicacionRuntimeConfig.apiHost();
     private static final String PLANTILLA_ENDPOINT_SALA = ComunicacionRuntimeConfig.apiEndpointSalaTemplate();
-        private static final String PLANTILLA_ENDPOINT_ACTUALIZACIONES_SALA =
+    private static final String PLANTILLA_ENDPOINT_ACTUALIZACIONES_SALA =
             ComunicacionRuntimeConfig.apiEndpointActualizacionesSalaTemplate();
     private static final int PUERTO_DEFECTO = ComunicacionRuntimeConfig.apiPuerto();
     private static final String PAYLOAD_INICIAL = ComunicacionRuntimeConfig.apiPayloadInicial();
 
     private final String salaId;
     private final String endpointSala;
-        private final String endpointActualizacionesSala;
+    private final String endpointActualizacionesSala;
     private final int puerto;
-        private final Queue<String> colaEntrante;
-        private final Queue<String> colaActualizaciones;
+    private final Queue<String> colaEntrante;
 
     private volatile boolean conectada;
     private volatile String ultimoMensaje;
@@ -46,7 +44,6 @@ public class ApiConexion implements Conexion<String> {
         this.endpointActualizacionesSala = construirEndpointActualizacionesSala(this.salaId);
         this.puerto = validarPuerto(puerto);
         this.colaEntrante = new ConcurrentLinkedQueue<>();
-        this.colaActualizaciones = new ConcurrentLinkedQueue<>();
         this.conectada = false;
         this.ultimoMensaje = PAYLOAD_INICIAL;
         activarConexionInicial();
@@ -79,7 +76,6 @@ public class ApiConexion implements Conexion<String> {
         validarConexionActiva();
         String payloadNoNulo = Objects.requireNonNull(payload, "El payload no puede ser nulo");
         this.ultimoMensaje = payloadNoNulo;
-        this.colaActualizaciones.offer(payloadNoNulo);
     }
 
     @Override
@@ -147,17 +143,7 @@ public class ApiConexion implements Conexion<String> {
 
     private void registrarMensajeEntrante(String payload) {
         String payloadNoNulo = Objects.requireNonNull(payload, "El payload no puede ser nulo");
-        this.ultimoMensaje = payloadNoNulo;
         this.colaEntrante.offer(payloadNoNulo);
-    }
-
-    private String obtenerSiguienteActualizacion() {
-        String payload = this.colaActualizaciones.poll();
-        return payload == null ? PAYLOAD_INICIAL : payload;
-    }
-
-    private boolean hayActualizacionesPendientes() {
-        return !this.colaActualizaciones.isEmpty();
     }
 
     private void validarConexionActiva() {
@@ -258,12 +244,13 @@ public class ApiConexion implements Conexion<String> {
             }
 
             if ("GET".equalsIgnoreCase(method)) {
-                if (!this.conexion.hayActualizacionesPendientes()) {
+                String ultimoMensaje = this.conexion.ultimoMensaje;
+                if (ultimoMensaje == null || ultimoMensaje.isBlank() || PAYLOAD_INICIAL.equals(ultimoMensaje.trim())) {
                     responderJson(exchange, 204, "");
                     return;
                 }
 
-                responderJson(exchange, 200, this.conexion.obtenerSiguienteActualizacion());
+                responderJson(exchange, 200, ultimoMensaje);
                 return;
             }
 
