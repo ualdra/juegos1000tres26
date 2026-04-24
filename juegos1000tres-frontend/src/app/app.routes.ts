@@ -8,4 +8,5 @@ export const routes: Routes = [
 	{ path: '', component: Home },
 	{ path: 'login', component: Auth },
 	{ path: 'sala', component: Lobby },
+	{ path: 'sala/:uuid', component: Lobby },
 ];

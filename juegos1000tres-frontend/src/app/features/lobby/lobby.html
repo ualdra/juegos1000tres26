@@ -1,1 +1,48 @@
-<p>lobby works!</p>
+<section class="lobby" *ngIf="viewMode === 'lobby'">
+	<h1>Salas</h1>
+
+	<button class="primary" (click)="crearSala()">Crear sala</button>
+
+	<div class="join">
+		<label for="uuid">UUID</label>
+		<input id="uuid" type="text" placeholder="123456" [(ngModel)]="uuidInput" />
+		<button class="secondary" (click)="unirseSala()">Unirse a sala</button>
+	</div>
+
+	<p class="error" *ngIf="errorUuid">{{ errorUuid }}</p>
+</section>
+
+<section class="sala" *ngIf="viewMode === 'sala'">
+	<div class="sala-header">
+		<span class="sala-id">Sala {{ uuidActual }}</span>
+	</div>
+
+	<div class="sala-body">
+		<div class="jugadores">
+			<h2>Jugadores</h2>
+			<div class="jugador" *ngFor="let jugador of jugadores">
+				<label>
+					<input
+						type="radio"
+						name="pantalla"
+						[value]="jugador.id"
+						[(ngModel)]="pantallaId"
+						(change)="cambiarPantalla(jugador.id)"
+						[disabled]="!esHost"
+					/>
+					<span>{{ jugador.nombre }}</span>
+				</label>
+			</div>
+			<p class="nota" *ngIf="!esHost">Solo el creador puede cambiar la pantalla.</p>
+		</div>
+
+		<div class="juegos">
+			<h2>Juegos disponibles</h2>
+			<ul>
+				<li *ngFor="let juego of juegosDisponibles">{{ juego }}</li>
+			</ul>
+		</div>
+	</div>
+
+	<button class="salir" (click)="salir()">Salir</button>
+</section>
