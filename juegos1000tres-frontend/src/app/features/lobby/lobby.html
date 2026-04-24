@@ -108,12 +108,12 @@
 							<img
 								class="juego-icon"
 								[src]="
-									juego.id === 'space-invaders'
+									juego.id === 'space-invaders' || juego.id === 'taptap'
 										? '/img/lobby/no-creen-needed.png'
-										: '/img/lobby/creen-needed.png'
+										: '/img/lobby/screen-needed.png'
 								"
 								[alt]="
-									juego.id === 'space-invaders'
+									juego.id === 'space-invaders' || juego.id === 'taptap'
 										? 'No requiere pantalla'
 										: 'Requiere pantalla'
 								"
@@ -143,6 +143,7 @@
 		<app-taptap
 			[uuid]="uuidActual"
 			[jugadorId]="jugadorId"
+			[pantallaId]="pantallaId"
 			[esPantalla]="pantallaId === jugadorId"
 			[esHost]="esHost"
 		></app-taptap>

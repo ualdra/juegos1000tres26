@@ -59,18 +59,18 @@ public class TapTapService {
         }
 
         if (!partida.estaFinalizada()) {
-            String ganadorId = resolverGanador(sala, partida);
+            List<String> ganadores = resolverGanadores(sala, partida);
             boolean victoriaRegistrada = false;
 
-            if (ganadorId != null) {
-                salaService.incrementarVictoria(uuid, ganadorId);
+            if (!ganadores.isEmpty()) {
+                ganadores.forEach(ganadorId -> salaService.incrementarVictoria(uuid, ganadorId));
                 victoriaRegistrada = true;
             }
 
             salaService.finalizarJuego(uuid, actorId);
-            partida.finalizar(ganadorId);
+            partida.finalizar(ganadores.size() == 1 ? ganadores.get(0) : null);
 
-            return new TapTapFinalRespuesta(ganadorId, victoriaRegistrada);
+            return new TapTapFinalRespuesta(ganadores.size() == 1 ? ganadores.get(0) : null, victoriaRegistrada);
         }
 
         return new TapTapFinalRespuesta(partida.getGanadorId(), false);
@@ -87,13 +87,18 @@ public class TapTapService {
 
     private TapTapEstadoRespuesta construirEstado(SalaRoom sala, TapTapPartida partida) {
         long ahora = System.currentTimeMillis();
+        String pantallaId = sala.getPantallaId();
         List<TapTapPuntuacion> puntuaciones = sala.getJugadores().stream()
-                .map(jugador -> new TapTapPuntuacion(
-                        jugador.getId().toString(),
-                        jugador.getNombre(),
-                        partida.obtenerPuntos(jugador.getId().toString())
-                ))
-                .toList();
+            .filter(jugador -> pantallaId == null
+                || pantallaId.isBlank()
+                || SalaRoom.PANTALLA_NINGUNO.equals(pantallaId)
+                || !jugador.getId().toString().equals(pantallaId))
+            .map(jugador -> new TapTapPuntuacion(
+                jugador.getId().toString(),
+                jugador.getNombre(),
+                partida.obtenerPuntos(jugador.getId().toString())
+            ))
+            .toList();
 
         return new TapTapEstadoRespuesta(
                 partida.getInicioEpochMs(),
@@ -105,28 +110,38 @@ public class TapTapService {
         );
     }
 
-    private String resolverGanador(SalaRoom sala, TapTapPartida partida) {
+    private List<String> resolverGanadores(SalaRoom sala, TapTapPartida partida) {
         List<Jugador> jugadores = sala.getJugadores();
         if (jugadores.isEmpty()) {
-            return null;
+            return List.of();
+        }
+
+        String pantallaId = sala.getPantallaId();
+        List<Jugador> jugadoresElegibles = jugadores.stream()
+                .filter(jugador -> pantallaId == null
+                        || pantallaId.isBlank()
+                        || SalaRoom.PANTALLA_NINGUNO.equals(pantallaId)
+                        || !jugador.getId().toString().equals(pantallaId))
+                .toList();
+
+        if (jugadoresElegibles.isEmpty()) {
+            return List.of();
         }
 
         Map<String, Integer> puntos = partida.getPuntos();
-        int maxPuntos = jugadores.stream()
+        int maxPuntos = jugadoresElegibles.stream()
                 .mapToInt(jugador -> puntos.getOrDefault(jugador.getId().toString(), 0))
                 .max()
                 .orElse(0);
 
         if (maxPuntos <= 0) {
-            return null;
+            return List.of();
         }
 
-        List<String> candidatos = jugadores.stream()
+        return jugadoresElegibles.stream()
                 .filter(jugador -> puntos.getOrDefault(jugador.getId().toString(), 0) == maxPuntos)
                 .map(jugador -> jugador.getId().toString())
                 .toList();
-
-        return candidatos.size() == 1 ? candidatos.get(0) : null;
     }
 
     private void validarJuegoActivo(SalaRoom sala) {

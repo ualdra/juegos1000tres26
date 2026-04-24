@@ -19,6 +19,7 @@ interface TapTarget {
 export class Taptap implements OnInit, OnDestroy {
   @Input() uuid = '';
   @Input() jugadorId = '';
+  @Input() pantallaId = '';
   @Input() esPantalla = false;
   @Input() esHost = false;
 
@@ -34,6 +35,7 @@ export class Taptap implements OnInit, OnDestroy {
   private finalizacionEnviada = false;
   private cargandoEstado = false;
   private contadorObjetivos = 1;
+  private ultimoSegundoMostrado = -1;
 
   private readonly vidaObjetivoMs = 3_000;
   private readonly intervaloObjetivoMs = 700;
@@ -51,7 +53,7 @@ export class Taptap implements OnInit, OnDestroy {
 
     this.cargarEstado(true);
     this.estadoSub = interval(1000).subscribe(() => this.cargarEstado(false));
-    this.tickSub = interval(100).subscribe(() => this.actualizarReloj());
+    this.tickSub = interval(250).subscribe(() => this.actualizarReloj());
 
     if (!this.esPantalla) {
       this.spawnSub = interval(this.intervaloObjetivoMs).subscribe(() => this.generarObjetivo());
@@ -101,7 +103,11 @@ export class Taptap implements OnInit, OnDestroy {
   private aplicarEstado(estado: TapTapEstado): void {
     this.inicioEpochMs = estado.inicioEpochMs;
     this.duracionMs = estado.duracionMs;
-    this.tabla = [...estado.puntuaciones].sort((a, b) => b.puntos - a.puntos);
+    const pantallaId = this.pantallaId && this.pantallaId !== 'NINGUNO' ? this.pantallaId : '';
+    const puntuaciones = pantallaId
+      ? estado.puntuaciones.filter(item => item.jugadorId !== pantallaId)
+      : estado.puntuaciones;
+    this.tabla = [...puntuaciones].sort((a, b) => b.puntos - a.puntos);
 
     if (this.jugadorId) {
       const entry = estado.puntuaciones.find(item => item.jugadorId === this.jugadorId);
@@ -125,7 +131,11 @@ export class Taptap implements OnInit, OnDestroy {
     const fin = this.inicioEpochMs + this.duracionMs;
     const restante = Math.max(0, fin - ahora);
 
-    this.segundosRestantes = Math.max(0, Math.ceil(restante / 1000));
+    const segundos = Math.max(0, Math.ceil(restante / 1000));
+    if (segundos !== this.ultimoSegundoMostrado) {
+      this.segundosRestantes = segundos;
+      this.ultimoSegundoMostrado = segundos;
+    }
     this.estadoTexto = ahora < this.inicioEpochMs
       ? 'Preparando duelo...'
       : restante <= 0
