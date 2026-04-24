@@ -7,6 +7,7 @@ public record SalaRespuesta(
         List<JugadorRespuesta> jugadores,
         String hostId,
         String pantallaId,
+        String juegoActual,
         String jugadorId
 ) {
 }

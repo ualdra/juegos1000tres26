@@ -47,6 +47,13 @@ public class SalaService {
         return construirRespuesta(room, null);
     }
 
+    public SalaRespuesta cambiarJuego(String uuid, String actorId, String juego) {
+        SalaRoom room = obtenerSala(uuid);
+        room.cambiarJuego(actorId, juego);
+
+        return construirRespuesta(room, null);
+    }
+
     public void salir(String uuid, String jugadorId) {
         SalaRoom room = obtenerSala(uuid);
 
@@ -76,7 +83,8 @@ public class SalaService {
                 jugadores,
                 room.getHostId(),
                 room.getPantallaId(),
-                jugadorId
+            room.getJuegoActual(),
+            jugadorId
         );
     }
 

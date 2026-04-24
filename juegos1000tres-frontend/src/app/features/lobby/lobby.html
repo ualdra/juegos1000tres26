@@ -12,7 +12,7 @@
 	<p class="error" *ngIf="errorUuid">{{ errorUuid }}</p>
 </section>
 
-<section class="sala" *ngIf="viewMode === 'sala'">
+<section class="sala" *ngIf="viewMode === 'sala'" [class.jugando]="juegoActual === 'space-invaders'">
 	<div class="sala-header">
 		<span class="sala-id">Sala {{ uuidActual }}</span>
 	</div>
@@ -33,15 +33,50 @@
 					<span>{{ jugador.nombre }}</span>
 				</label>
 			</div>
+			<div class="jugador jugador-ninguno">
+				<label>
+					<input
+						type="radio"
+						name="pantalla"
+						[value]="pantallaNingunoId"
+						[(ngModel)]="pantallaId"
+						(change)="cambiarPantalla(pantallaNingunoId)"
+						[disabled]="!esHost"
+					/>
+					<span>Ninguno</span>
+				</label>
+			</div>
 			<p class="nota" *ngIf="!esHost">Solo el creador puede cambiar la pantalla.</p>
 		</div>
 
 		<div class="juegos">
 			<h2>Juegos disponibles</h2>
 			<ul>
-				<li *ngFor="let juego of juegosDisponibles">{{ juego }}</li>
+				<li *ngFor="let juego of juegosDisponibles">
+					<span>{{ juego.nombre }}</span>
+					<button
+						class="secondary"
+						(click)="iniciarJuego(juego.id)"
+						[disabled]="!esHost"
+					>
+						Iniciar
+					</button>
+				</li>
 			</ul>
+			<p class="nota" *ngIf="!esHost">Solo el creador puede iniciar un juego.</p>
 		</div>
+	</div>
+
+	<div class="juego" *ngIf="juegoActual === 'space-invaders'">
+		<ng-container *ngIf="pantallaId !== jugadorId && pantallaId !== pantallaNingunoId">
+			<iframe class="juego-frame" [src]="juegoUrl" title="Space Invaders"></iframe>
+		</ng-container>
+		<ng-container *ngIf="pantallaId === jugadorId">
+			<iframe class="juego-frame" [src]="pantallaUrl" title="Space Invaders - Pantalla"></iframe>
+		</ng-container>
+		<ng-container *ngIf="pantallaId === pantallaNingunoId">
+			<iframe class="juego-frame" [src]="juegoUrl" title="Space Invaders"></iframe>
+		</ng-container>
 	</div>
 
 	<button class="salir" (click)="salir()">Salir</button>

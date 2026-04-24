@@ -9,10 +9,13 @@ import java.util.UUID;
 
 public class SalaRoom {
 
+    public static final String PANTALLA_NINGUNO = "NINGUNO";
+
     private final String uuid;
     private final Sala sala;
     private final String creadorId;
     private String pantallaId;
+    private String juegoActual;
     private int contadorNombres = 1;
 
     public SalaRoom(String uuid, Sala sala, String creadorId) {
@@ -20,6 +23,7 @@ public class SalaRoom {
         this.sala = Objects.requireNonNull(sala, "sala requerida");
         this.creadorId = Objects.requireNonNull(creadorId, "creador requerido");
         this.pantallaId = creadorId;
+        this.juegoActual = "";
     }
 
     public synchronized Jugador agregarJugador(String nombre) {
@@ -45,6 +49,11 @@ public class SalaRoom {
             throw new SecurityException("Solo el creador puede cambiar la pantalla");
         }
 
+        if (PANTALLA_NINGUNO.equals(jugadorId)) {
+            pantallaId = PANTALLA_NINGUNO;
+            return;
+        }
+
         UUID id = UUID.fromString(jugadorId);
         boolean existe = sala.getJugadores().stream()
                 .anyMatch(jugador -> jugador.getId().equals(id));
@@ -54,6 +63,18 @@ public class SalaRoom {
         }
 
         pantallaId = jugadorId;
+    }
+
+    public synchronized void cambiarJuego(String actorId, String juego) {
+        if (!creadorId.equals(actorId)) {
+            throw new SecurityException("Solo el creador puede cambiar el juego");
+        }
+
+        if (juego == null || juego.isBlank()) {
+            throw new IllegalArgumentException("Juego invalido");
+        }
+
+        this.juegoActual = juego.trim();
     }
 
     public boolean esCreador(String jugadorId) {
@@ -78,5 +99,9 @@ public class SalaRoom {
 
     public String getPantallaId() {
         return pantallaId;
+    }
+
+    public String getJuegoActual() {
+        return juegoActual;
     }
 }

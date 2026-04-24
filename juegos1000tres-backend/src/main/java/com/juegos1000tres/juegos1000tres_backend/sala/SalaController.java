@@ -45,6 +45,13 @@ public class SalaController {
         return salaService.cambiarPantalla(uuid, actorId, jugadorId);
     }
 
+    @PostMapping("/{uuid}/juego")
+    public SalaRespuesta cambiarJuego(@PathVariable String uuid,
+                                      @RequestParam String actorId,
+                                      @RequestParam String juego) {
+        return salaService.cambiarJuego(uuid, actorId, juego);
+    }
+
     @PostMapping("/{uuid}/salir")
     public ResponseEntity<Void> salirSala(@PathVariable String uuid,
                                           @RequestParam String jugadorId) {

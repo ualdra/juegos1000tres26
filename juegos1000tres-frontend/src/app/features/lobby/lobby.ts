@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription, interval } from 'rxjs';
@@ -20,10 +21,17 @@ export class Lobby implements OnInit, OnDestroy {
   jugadorId = '';
   hostId = '';
   pantallaId = '';
+  juegoActual = '';
   jugadores: JugadorResumen[] = [];
   esHost = false;
+  pantallaNingunoId = 'NINGUNO';
 
-  juegosDisponibles = ['Juego 1', 'Juego 2', 'Juego 3'];
+  juegoUrl?: SafeResourceUrl;
+  pantallaUrl?: SafeResourceUrl;
+  private juegoUrlRaw = '';
+  private pantallaUrlRaw = '';
+
+  juegosDisponibles = [{ id: 'space-invaders', nombre: 'Space Invaders' }];
 
   private readonly apiBase = 'http://localhost:8082';
   private polling?: Subscription;
@@ -32,7 +40,8 @@ export class Lobby implements OnInit, OnDestroy {
     private readonly http: HttpClient,
     private readonly router: Router,
     private readonly route: ActivatedRoute,
-    private readonly cdr: ChangeDetectorRef
+    private readonly cdr: ChangeDetectorRef,
+    private readonly sanitizer: DomSanitizer
   ) {}
 
   ngOnInit(): void {
@@ -122,6 +131,31 @@ export class Lobby implements OnInit, OnDestroy {
       });
   }
 
+  iniciarJuego(juegoId: string): void {
+    if (!this.esHost || !this.uuidActual) {
+      return;
+    }
+
+    const actorId = this.jugadorId;
+
+    if (!actorId) {
+      return;
+    }
+
+    this.http
+      .post<SalaRespuesta>(
+        `${this.apiBase}/sala/${this.uuidActual}/juego?actorId=${actorId}&juego=${juegoId}`,
+        null
+      )
+      .subscribe({
+        next: respuesta => this.actualizarDatos(respuesta),
+        error: () => {
+          this.errorUuid = 'No se pudo iniciar el juego';
+          this.cdr.detectChanges();
+        }
+      });
+  }
+
   salir(): void {
     if (!this.uuidActual) {
       return;
@@ -174,8 +208,36 @@ export class Lobby implements OnInit, OnDestroy {
     this.jugadores = respuesta.jugadores || [];
     this.hostId = respuesta.hostId;
     this.pantallaId = respuesta.pantallaId || '';
+    this.juegoActual = respuesta.juegoActual || '';
     this.esHost = !!this.jugadorId && this.jugadorId === this.hostId;
+    this.actualizarUrlsJuego();
     this.cdr.detectChanges();
+  }
+
+  private actualizarUrlsJuego(): void {
+    if (this.juegoActual !== 'space-invaders' || !this.uuidActual) {
+      this.juegoUrl = undefined;
+      this.pantallaUrl = undefined;
+      this.juegoUrlRaw = '';
+      this.pantallaUrlRaw = '';
+      return;
+    }
+
+    const base = 'http://localhost:5000';
+    const pantallaId = this.uuidActual;
+
+    const juegoUrlRaw = `${base}/`;
+    const pantallaUrlRaw = `${base}/pantalla?screenId=${encodeURIComponent(pantallaId)}`;
+
+    if (juegoUrlRaw !== this.juegoUrlRaw) {
+      this.juegoUrlRaw = juegoUrlRaw;
+      this.juegoUrl = this.sanitizer.bypassSecurityTrustResourceUrl(juegoUrlRaw);
+    }
+
+    if (pantallaUrlRaw !== this.pantallaUrlRaw) {
+      this.pantallaUrlRaw = pantallaUrlRaw;
+      this.pantallaUrl = this.sanitizer.bypassSecurityTrustResourceUrl(pantallaUrlRaw);
+    }
   }
 
   private iniciarPolling(): void {
@@ -207,5 +269,6 @@ interface SalaRespuesta {
   jugadores: JugadorResumen[];
   hostId: string;
   pantallaId: string;
+  juegoActual: string;
   jugadorId?: string;
 }
