@@ -6,10 +6,11 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription, interval } from 'rxjs';
 import { GenericButton } from '../../shared/components/generic-button/generic-button';
+import { Taptap } from '../games/taptap/taptap';
 
 @Component({
   selector: 'app-lobby',
-  imports: [CommonModule, FormsModule, GenericButton],
+  imports: [CommonModule, FormsModule, GenericButton, Taptap],
   templateUrl: './lobby.html',
   styleUrl: './lobby.css',
 })
@@ -32,7 +33,10 @@ export class Lobby implements OnInit, OnDestroy {
   private juegoUrlRaw = '';
   private pantallaUrlRaw = '';
 
-  juegosDisponibles = [{ id: 'space-invaders', nombre: 'Space Invaders' }];
+  juegosDisponibles = [
+    { id: 'space-invaders', nombre: 'Space Invaders' },
+    { id: 'taptap', nombre: 'TapTap' }
+  ];
 
   private readonly apiBase = 'http://localhost:8083';
   private polling?: Subscription;
@@ -263,6 +267,7 @@ export class Lobby implements OnInit, OnDestroy {
 interface JugadorResumen {
   id: string;
   nombre: string;
+  victorias: number;
 }
 
 interface SalaRespuesta {

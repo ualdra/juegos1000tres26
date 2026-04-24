@@ -77,6 +77,24 @@ public class SalaRoom {
         this.juegoActual = juego.trim();
     }
 
+    public synchronized void finalizarJuego(String actorId) {
+        if (!creadorId.equals(actorId)) {
+            throw new SecurityException("Solo el creador puede finalizar el juego");
+        }
+
+        this.juegoActual = "";
+    }
+
+    public synchronized void sumarVictoria(String jugadorId) {
+        UUID id = UUID.fromString(jugadorId);
+        Jugador jugador = sala.getJugadores().stream()
+                .filter(item -> item.getId().equals(id))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Jugador no encontrado"));
+
+        jugador.sumarPuntos(1);
+    }
+
     public boolean esCreador(String jugadorId) {
         return creadorId.equals(jugadorId);
     }

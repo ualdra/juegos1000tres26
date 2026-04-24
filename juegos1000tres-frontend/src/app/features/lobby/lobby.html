@@ -12,7 +12,11 @@
 	<p class="error" *ngIf="errorUuid">{{ errorUuid }}</p>
 </section>
 
-<section class="sala" *ngIf="viewMode === 'sala'" [class.jugando]="juegoActual === 'space-invaders'">
+<section
+	class="sala"
+	*ngIf="viewMode === 'sala'"
+	[class.jugando]="juegoActual === 'space-invaders' || juegoActual === 'taptap'"
+>
 	<div class="sala-layout">
 		<aside class="sala-sidebar">
 			<div class="sala-tag">
@@ -67,7 +71,7 @@
 									</label>
 								</td>
 								<td>{{ jugador.nombre }}</td>
-								<td class="wins">0</td>
+								<td class="wins">{{ jugador.victorias ?? 0 }}</td>
 							</tr>
 							<tr class="jugador-ninguno">
 								<td>
@@ -133,6 +137,15 @@
 		<ng-container *ngIf="pantallaId === pantallaNingunoId">
 			<iframe class="juego-frame" [src]="juegoUrl" title="Space Invaders"></iframe>
 		</ng-container>
+	</div>
+
+	<div class="juego taptap" *ngIf="juegoActual === 'taptap'">
+		<app-taptap
+			[uuid]="uuidActual"
+			[jugadorId]="jugadorId"
+			[esPantalla]="pantallaId === jugadorId"
+			[esHost]="esHost"
+		></app-taptap>
 	</div>
 
 </section>

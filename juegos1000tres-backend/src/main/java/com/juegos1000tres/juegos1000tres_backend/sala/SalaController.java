@@ -52,6 +52,20 @@ public class SalaController {
         return salaService.cambiarJuego(uuid, actorId, juego);
     }
 
+    @PostMapping("/{uuid}/juego/finalizar")
+    public ResponseEntity<Void> finalizarJuego(@PathVariable String uuid,
+                                               @RequestParam String actorId) {
+        salaService.finalizarJuego(uuid, actorId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{uuid}/victoria")
+    public ResponseEntity<Void> sumarVictoria(@PathVariable String uuid,
+                                              @RequestParam String jugadorId) {
+        salaService.incrementarVictoria(uuid, jugadorId);
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/{uuid}/salir")
     public ResponseEntity<Void> salirSala(@PathVariable String uuid,
                                           @RequestParam String jugadorId) {

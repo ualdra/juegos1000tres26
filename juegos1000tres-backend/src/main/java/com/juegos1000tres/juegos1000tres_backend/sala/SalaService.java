@@ -54,6 +54,20 @@ public class SalaService {
         return construirRespuesta(room, null);
     }
 
+    public void finalizarJuego(String uuid, String actorId) {
+        SalaRoom room = obtenerSala(uuid);
+        room.finalizarJuego(actorId);
+    }
+
+    public void incrementarVictoria(String uuid, String jugadorId) {
+        SalaRoom room = obtenerSala(uuid);
+        room.sumarVictoria(jugadorId);
+    }
+
+    public SalaRoom obtenerSalaRoom(String uuid) {
+        return obtenerSala(uuid);
+    }
+
     public void salir(String uuid, String jugadorId) {
         SalaRoom room = obtenerSala(uuid);
 
@@ -75,7 +89,11 @@ public class SalaService {
 
     private SalaRespuesta construirRespuesta(SalaRoom room, String jugadorId) {
         List<JugadorRespuesta> jugadores = room.getJugadores().stream()
-                .map(jugador -> new JugadorRespuesta(jugador.getId().toString(), jugador.getNombre()))
+            .map(jugador -> new JugadorRespuesta(
+                jugador.getId().toString(),
+                jugador.getNombre(),
+                jugador.getPuntuacion()
+            ))
                 .toList();
 
         return new SalaRespuesta(

@@ -241,6 +241,11 @@ h2 {
 	padding: 1rem;
 }
 
+.juego.taptap {
+	background: transparent;
+	padding: 0;
+}
+
 .juego-frame {
 	border: none;
 	width: 100%;
